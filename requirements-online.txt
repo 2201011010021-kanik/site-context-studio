@@ -2,3 +2,4 @@ pyarrow>=21,<22
 shapely>=2,<3
 fsspec>=2024,<2027
 aiohttp>=3.14.4,<4
+certifi>=2025.11.12,<2027
