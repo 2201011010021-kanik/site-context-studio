@@ -49,4 +49,4 @@ const png=makePng(256);
 const icoHeader=Buffer.alloc(22);icoHeader.writeUInt16LE(1,2);icoHeader.writeUInt16LE(1,4);icoHeader.writeUInt16LE(1,10);icoHeader.writeUInt16LE(32,12);icoHeader.writeUInt32LE(png.length,14);icoHeader.writeUInt32LE(22,18);
 await mkdir('build',{recursive:true});
 await writeFile('build/icon.ico',Buffer.concat([icoHeader,png]));
-await writeFile('build/icon.png',makePng(512));
+await writeFile('build/icon.png',makePng(1024));
