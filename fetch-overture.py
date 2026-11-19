@@ -3,9 +3,17 @@
 import json
 import os
 import re
+import ssl
 import sys
 from pathlib import Path
 from urllib.request import urlopen
+
+import certifi
+
+# Frozen desktop builds do not inherit a reliable system CA path. Configure the
+# bundled Mozilla CA store before aiohttp/fsspec create their SSL contexts.
+os.environ.setdefault('SSL_CERT_FILE', certifi.where())
+os.environ.setdefault('REQUESTS_CA_BUNDLE', certifi.where())
 
 import fsspec
 from aiohttp import ClientError
@@ -20,6 +28,11 @@ from shapely.wkb import loads as wkb_loads
 TYPES = [('building', 'buildings'), ('segment', 'roads'), ('water', 'water'), ('land_use', 'landuse')]
 MAX_FEATURES = 150_000
 MAX_CATALOG_BYTES = 64 * 1024 * 1024
+SSL_CONTEXT = ssl.create_default_context(cafile=certifi.where())
+
+
+def open_https(url, timeout):
+    return urlopen(url, timeout=timeout, context=SSL_CONTEXT)
 
 
 def collection_catalog(release):
@@ -32,7 +45,7 @@ def collection_catalog(release):
     except (OSError, pa.ArrowException):
         pass  # A partial or damaged cache is replaced from the public catalog.
 
-    with urlopen(f'https://stac.overturemaps.org/{release}/collections.parquet', timeout=35) as response:
+    with open_https(f'https://stac.overturemaps.org/{release}/collections.parquet', timeout=35) as response:
         payload = response.read(MAX_CATALOG_BYTES + 1)
     if len(payload) > MAX_CATALOG_BYTES:
         raise ValueError('Overture catalog exceeds the local size limit.')
@@ -116,7 +129,7 @@ def fetch(request):
         raise ValueError('Select at least one valid data layer.')
     release = request.get('release')
     if release is None:
-        with urlopen('https://stac.overturemaps.org/catalog.json', timeout=25) as response:
+        with open_https('https://stac.overturemaps.org/catalog.json', timeout=25) as response:
             release = json.load(response)['latest']
     if not isinstance(release, str) or not re.fullmatch(r'\d{4}-\d{2}-\d{2}\.\d+', release):
         raise ValueError('Invalid release identifier')
@@ -157,7 +170,12 @@ def fetch(request):
 if __name__ == '__main__':
     try:
         if sys.argv[1:] == ['--self-test']:
-            print(json.dumps({'ok': True, 'pyarrow': pa.__version__}))
+            print(json.dumps({'ok': True, 'pyarrow': pa.__version__, 'ca_bundle': Path(certifi.where()).is_file()}))
+            sys.exit(0)
+        if sys.argv[1:] == ['--network-self-test']:
+            with open_https('https://stac.overturemaps.org/catalog.json', timeout=25) as response:
+                latest = json.load(response)['latest']
+            print(json.dumps({'ok': True, 'https': True, 'latest': latest}))
             sys.exit(0)
         print(json.dumps(fetch(json.load(sys.stdin)), separators=(',', ':')))
     except Exception as error:

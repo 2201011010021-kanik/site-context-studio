@@ -26,12 +26,14 @@ jobs:
       - name: Install and bundle online reader
         run: |
           python -m pip install -r requirements-online.txt pyinstaller==6.22.3
-          python -m PyInstaller --noconfirm --clean --onedir --name site-context-reader --collect-all pyarrow --collect-all shapely --collect-all fsspec --collect-all aiohttp fetch-overture.py
+          python -m PyInstaller --noconfirm --clean --onedir --name site-context-reader --collect-all pyarrow --collect-all shapely --collect-all fsspec --collect-all aiohttp --collect-data certifi fetch-overture.py
       - name: Check bundled reader starts
         shell: pwsh
         run: |
           & .\dist\site-context-reader\site-context-reader.exe --self-test
           if ($LASTEXITCODE -ne 0) { throw 'Bundled reader did not start' }
+          & .\dist\site-context-reader\site-context-reader.exe --network-self-test
+          if ($LASTEXITCODE -ne 0) { throw 'Bundled reader could not verify HTTPS' }
       - name: Run app tests
         run: npm test
       - name: Build Windows installer
@@ -62,9 +64,11 @@ jobs:
       - name: Install and bundle online reader
         run: |
           python -m pip install -r requirements-online.txt pyinstaller==6.22.3
-          python -m PyInstaller --noconfirm --clean --onedir --name site-context-reader --collect-all pyarrow --collect-all shapely --collect-all fsspec --collect-all aiohttp fetch-overture.py
+          python -m PyInstaller --noconfirm --clean --onedir --name site-context-reader --collect-all pyarrow --collect-all shapely --collect-all fsspec --collect-all aiohttp --collect-data certifi fetch-overture.py
       - name: Check bundled reader starts
-        run: ./dist/site-context-reader/site-context-reader --self-test
+        run: |
+          ./dist/site-context-reader/site-context-reader --self-test
+          ./dist/site-context-reader/site-context-reader --network-self-test
       - name: Run app tests
         run: npm test
       - name: Build Mac installer
