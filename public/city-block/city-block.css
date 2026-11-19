@@ -1,0 +1,28 @@
+:host{display:block;width:100%;min-width:0}
+.frame{position:relative;width:100%;aspect-ratio:1.55;min-height:320px;overflow:hidden;background:#f5f7fa}
+canvas{display:block;width:100%;height:100%;cursor:grab;touch-action:none}
+canvas.dragging{cursor:grabbing}
+canvas:focus-visible{outline:2px solid #8aaff3;outline-offset:-2px}
+.building-labels{position:absolute;inset:0;pointer-events:none;visibility:hidden}
+:host([data-ready]) .building-labels{visibility:visible}
+.building-label{position:absolute;display:flex;flex-direction:column;gap:3px;padding:0;border:0;background:transparent;color:#171a20;font-family:var(--ui-font);line-height:1.3;text-align:left;cursor:pointer;pointer-events:auto}
+.building-label:hover strong,.building-label:focus-visible strong{color:#245bff}
+.building-label:focus-visible{outline:2px solid #245bff;outline-offset:5px}
+.building-label small{font-size:10px;font-weight:700;letter-spacing:.08em;color:#245bff}
+.building-label strong{font-size:clamp(13px,1.15vw,16px);font-weight:700;letter-spacing:-.025em}
+.building-label em{font-size:12px;font-style:normal;font-weight:400;line-height:1.35;color:#626b78}
+.building-label[hidden]{display:none}
+.no-webgl canvas,.no-webgl .building-labels{display:none}
+.city-unavailable{position:absolute;top:35%;left:8%;right:8%;text-align:center;color:#626b78;font:500 15px/1.5 var(--ui-font)}
+.hover-label{position:absolute;z-index:2;padding:7px 10px;background:rgba(255,255,255,.96);border:1px solid #d1dff4;border-radius:6px;color:#3869ad;font:600 12px/1.2 var(--ui-font);box-shadow:0 3px 10px rgba(29,56,91,.08);pointer-events:none;white-space:nowrap}
+.hover-label[hidden]{display:none}
+@media(max-width:700px){
+  .frame{display:flex;flex-direction:column;aspect-ratio:auto;min-height:0;overflow:visible}
+  .building-labels{position:relative;inset:auto;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;order:0;margin-bottom:10px;min-height:75px}
+  .building-label{position:relative;min-width:0;align-self:start}
+  .building-label small{font-size:9px;letter-spacing:.02em}
+  .building-label strong{font-size:12px}
+  .building-label em{font-size:10px}
+  canvas{order:1;height:clamp(270px,76vw,420px);flex:none}
+  .hover-label{display:none}
+}

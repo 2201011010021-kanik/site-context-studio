@@ -1,0 +1,17 @@
+.DS_Store
+.git
+.local
+.env
+.env.*
+.venv
+data
+local-data
+node_modules
+capture-jobs
+*.log
+*.zip
+*.sqlite*
+*.test.mjs
+demo-server.integration.mjs
+scripts
+*.md

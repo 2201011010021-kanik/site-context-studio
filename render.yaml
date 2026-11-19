@@ -1,0 +1,23 @@
+services:
+  - type: web
+    name: kaniks-site-context-free-demo
+    runtime: docker
+    plan: free
+    region: singapore
+    autoDeployTrigger: off
+    healthCheckPath: /api/health
+    envVars:
+      - key: HOST
+        value: 0.0.0.0
+      - key: ACCOUNTS_DB
+        value: /tmp/unused-accounts.sqlite
+      - key: DEMO_EPHEMERAL
+        value: "1"
+      - key: SECURE_COOKIES
+        value: "1"
+      - key: TRUST_RENDER_PROXY
+        value: "1"
+      - key: REQUIRE_DEMO_PASSWORD
+        value: "1"
+      - key: DEMO_PASSWORD
+        sync: false

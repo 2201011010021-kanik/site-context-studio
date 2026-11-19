@@ -1,0 +1,16 @@
+.DS_Store
+node_modules/
+.venv/
+.env
+.env.*
+!.env.example
+*.log
+*.zip
+coverage/
+local-data/
+.local/
+data/
+capture-jobs/
+dist/
+release/
+build/
