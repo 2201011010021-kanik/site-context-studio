@@ -11,7 +11,8 @@
     "test": "node --test",
     "test:demo": "node --test demo-server.integration.mjs",
     "desktop": "electron .",
-    "dist:win": "node scripts/make-desktop-icon.mjs && electron-builder --win nsis"
+    "dist:win": "node scripts/make-desktop-icon.mjs && electron-builder --win nsis",
+    "dist:mac": "node scripts/make-desktop-icon.mjs && electron-builder --mac dmg --arm64"
   },
   "engines": { "node": ">=24" },
   "devDependencies": {
@@ -42,6 +43,7 @@
       { "from": "dist/site-context-reader", "to": "site-context-reader" }
     ],
     "win": { "target": ["nsis"], "icon": "build/icon.ico" },
+    "mac": { "target": ["dmg"], "icon": "build/icon.png", "artifactName": "Site-Context-Studio-Mac-${version}-${arch}.${ext}" },
     "nsis": {
       "oneClick": false,
       "allowToChangeInstallationDirectory": true,

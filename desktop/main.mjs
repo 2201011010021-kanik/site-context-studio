@@ -36,7 +36,7 @@ async function start(){
   process.env.OVERTURE_CATALOG_CACHE_DIR=path.join(dataDir,'overture-catalog');
   process.env.OVERTURE_WORK_DIR=dataDir;
   if(app.isPackaged){
-    process.env.OVERTURE_READER_EXE=path.join(process.resourcesPath,'site-context-reader','site-context-reader.exe');
+    process.env.OVERTURE_READER_EXE=path.join(process.resourcesPath,'site-context-reader',process.platform==='win32'?'site-context-reader.exe':'site-context-reader');
   }
   ({server}=await import('../server.mjs'));
   await new Promise((resolve,reject)=>{

@@ -2,6 +2,8 @@ name: Windows desktop installer
 
 on:
   workflow_dispatch:
+  pull_request:
+    branches: [main]
 
 jobs:
   build:
@@ -38,5 +40,40 @@ jobs:
         with:
           name: site-context-studio-windows-installer
           path: release/*Setup*.exe
+          if-no-files-found: error
+          retention-days: 30
+  mac:
+    runs-on: macos-15
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+          cache-dependency-path: requirements-online.txt
+      - name: Install JavaScript dependencies
+        run: npm ci
+      - name: Install and bundle online reader
+        run: |
+          python -m pip install -r requirements-online.txt pyinstaller==6.22.3
+          python -m PyInstaller --noconfirm --clean --onedir --name site-context-reader --collect-all pyarrow --collect-all shapely --collect-all fsspec --collect-all aiohttp fetch-overture.py
+      - name: Check bundled reader starts
+        run: ./dist/site-context-reader/site-context-reader --self-test
+      - name: Run app tests
+        run: npm test
+      - name: Build Mac installer
+        run: npm run dist:mac
+        env:
+          CSC_IDENTITY_AUTO_DISCOVERY: 'false'
+      - uses: actions/upload-artifact@v4
+        with:
+          name: site-context-studio-mac-arm64
+          path: release/*.dmg
           if-no-files-found: error
           retention-days: 30
